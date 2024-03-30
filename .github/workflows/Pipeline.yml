@@ -23,4 +23,4 @@ jobs:
       working-directory: ./TikTok-Clone-User-Service
       run: dotnet build --configuration Release --no-restore
     - name: Test
-      run: dotnet test User-Service-testing/User-Service-testing.csproj --no-build --verbosity normal
+      run: dotnet test TikTok-Clone-User-Servcie/User-Service-testing/User-Service-testing.csproj --no-build --verbosity normal
