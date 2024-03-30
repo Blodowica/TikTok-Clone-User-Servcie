@@ -20,6 +20,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj
     - name: Build
-      run: dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj --configuration Release --no-restore
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test User-Service-testing/User-Service-testing.csproj --no-build --verbosity normal
