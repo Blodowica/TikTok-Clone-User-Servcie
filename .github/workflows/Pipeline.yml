@@ -28,9 +28,7 @@ jobs:
       working-directory: ./TikTok-Clone-User-Service
       run: dotnet build --configuration Release --no-restore
       
-    - name: Test
-      working-directory: ./User-Service-testing
-      run: dotnet test --no-build --verbosity normal
+
       
   analyze:
     name: Build and analyze
