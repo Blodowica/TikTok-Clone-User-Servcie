@@ -5,9 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "Development" ]
   pull_request:
-    branches: [ "development" ]
+    branches: [ "Development" ]
 
 jobs:
   build:
@@ -23,6 +23,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj --no-restore
+      run: dotnet build /TikTok-Clone-User-Service --no-restore
     - name: Test
-      run: dotnet test TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj --no-build --verbosity normal
+      run: dotnet test /TikTok-Clone-User-Service --no-build --verbosity normal
