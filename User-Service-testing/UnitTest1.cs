@@ -4,8 +4,17 @@ namespace User_Service_testing
     public class UnitTest1
     {
         [TestMethod]
-        public void TestMethod1()
+        public void AlwaysPassingTest()
         {
+ 
+               // Arrange - Nothing to arrange
+
+                // Act - Nothing to act upon
+
+                // Assert
+                Assert.IsTrue(true); // This assertion will always pass
+            
+
         }
     }
 }
