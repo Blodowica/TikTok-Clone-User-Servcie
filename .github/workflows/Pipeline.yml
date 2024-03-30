@@ -25,4 +25,4 @@ jobs:
     - name: Build
       run: dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj --no-restore
     - name: Test
-      run: dotnet test User-Service-testing/User-Service-testing.csproj --no-build --verbosity normal
+      run: dotnet test User-Service-testing --no-build --verbosity normal
