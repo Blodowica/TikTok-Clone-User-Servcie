@@ -19,8 +19,11 @@ jobs:
         dotnet-version: 8.0.201
     - name: Restore dependencies
       run: dotnet restore TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj
+      
     - name: Build
       working-directory: ./TikTok-Clone-User-Service
       run: dotnet build --configuration Release --no-restore
+      
     - name: Test
-      run: dotnet test User-Service-testing/User-Service-testing.csproj --no-build --verbosity normal
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet test --no-build --verbosity normal
