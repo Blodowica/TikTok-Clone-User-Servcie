@@ -3,7 +3,7 @@ namespace User_Service_testing
     [TestClass]
     public class UnitTest1
     {
-        [TestMethod]
+    /*    [TestMethod]
         public void AlwaysPassingTest()
         {
  
@@ -15,6 +15,6 @@ namespace User_Service_testing
                 Assert.IsTrue(true); // This assertion will always pass
             
 
-        }
+        }*/
     }
 }
