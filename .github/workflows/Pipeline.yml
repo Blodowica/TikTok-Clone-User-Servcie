@@ -2,31 +2,37 @@ name: .NET
 
 on:
   push:
-    branches: ["Development"]
+    branches:  
+      - Development 
+      - Main
   pull_request:
-    branches: ["Development"]
+    branches:
+      - Development
+      - Main
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.201
-      - name: Restore dependencies
-        run: dotnet restore TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj
-
-      - name: Build
-        working-directory: ./TikTok-Clone-User-Service
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Test
-        working-directory: ./TikTok-Clone-User-Service
-        run: dotnet test --no-build --verbosity normal
-
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.201
+    - name: Restore dependencies
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet restore 
+      
+    - name: Build
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Test
+      working-directory: ./TikTok-Clone-User-Service/User-Service-testing
+      run: dotnet test --no-build --verbosity normal
+      
   analyze:
     name: Build and analyze
     runs-on: windows-latest
@@ -35,10 +41,10 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: "zulu" # Alternative distribution options are available.
+          distribution: 'zulu' # Alternative distribution options are available.
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -60,7 +66,7 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
