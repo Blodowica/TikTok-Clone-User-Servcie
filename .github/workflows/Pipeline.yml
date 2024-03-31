@@ -18,7 +18,7 @@ jobs:
       with:
         dotnet-version: 8.0.201
     - name: Restore dependencies
-      run: dotnet restore TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj
+      run: dotnet restore TikTok-Clone-User-Service
       
     - name: Build
       working-directory: ./TikTok-Clone-User-Service
