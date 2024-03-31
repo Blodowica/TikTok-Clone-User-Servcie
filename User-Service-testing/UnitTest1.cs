@@ -12,6 +12,7 @@ namespace User_Service_testing
                 // Act - Nothing to act upon
 
                 // Assert
+
                 Assert.IsTrue(true); // This assertion will always pass
             
 
