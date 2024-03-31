@@ -2,13 +2,9 @@ name: .NET
 
 on:
   push:
-    branches:  
-      - Development 
-      - Main
+    branches: [ "Development" ]
   pull_request:
-    branches:
-      - Development
-      - Main
+    branches: [ "Development" ]
 
 jobs:
   build:
@@ -22,15 +18,14 @@ jobs:
       with:
         dotnet-version: 8.0.201
     - name: Restore dependencies
-      working-directory: ./TikTok-Clone-User-Service
-      run: dotnet restore 
+      run: dotnet restore TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj
       
     - name: Build
       working-directory: ./TikTok-Clone-User-Service
       run: dotnet build --configuration Release --no-restore
       
     - name: Test
-      working-directory: ./User-Service-testing
+      working-directory: ./TikTok-Clone-User-Service
       run: dotnet test --no-build --verbosity normal
       
   analyze:
