@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 TikTok-Clone-User-Service/TikTok-Clone-User-Service.sln
+TikTok-Clone-User-Service/userDatabase.db
+TikTok-Clone-User-Service/userDatabase.db-shm
+TikTok-Clone-User-Service/userDatabase.db-wal
