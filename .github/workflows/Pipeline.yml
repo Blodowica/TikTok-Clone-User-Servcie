@@ -82,7 +82,7 @@ jobs:
         working-directory: ./TikTok-Clone-User-Service
         run: dotnet restore
       - name: Restore dependencies
-        run: dotnet restore ./path/to/your.sln
+        run: dotnet restore TikTok-Clone-User-Service
       - name: Run Snyk to check for vulnerabilities
         run: |
           # Change directory to your project directory
