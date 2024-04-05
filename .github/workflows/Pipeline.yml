@@ -86,7 +86,7 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         run: |
           # Change directory to your project directory
-          cd ./path/to/your/project
+          cd ././TikTok-Clone-User-Service
           
           # Install Snyk CLI
           npm install -g snyk
