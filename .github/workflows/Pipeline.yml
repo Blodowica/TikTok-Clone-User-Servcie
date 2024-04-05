@@ -69,26 +69,34 @@ jobs:
           dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj  --no-incremental
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
+
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with: 
-          dotnet-version: 8.0.201
-      - name: Restore dependencies
-        working-directory: ./TikTok-Clone-User-Service
-        run: dotnet restore
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@master
-        continue-on-error: true # To make sure that SARIF upload gets called
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        uses: actions/setup-dotnet@v3
         with:
-          args: --sarif-file-output=snyk.sarif
+          dotnet-version: '3.0.3' # Update to your desired version
+      - name: Restore dependencies
+        run: dotnet restore ./path/to/your.sln
+      - name: Run Snyk to check for vulnerabilities
+        run: |
+          # Change directory to your project directory
+          cd ./path/to/your/project
+          
+          # Install Snyk CLI
+          npm install -g snyk
+          
+          # Authenticate with Snyk using token
+          snyk auth ${{ secrets.SNYK_TOKEN }}
+          
+          # Run Snyk to check for vulnerabilities
+          snyk test --sarif-file-output=snyk.sarif
+        continue-on-error: true # To ensure SARIF upload gets called even if Snyk fails
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ./snyk.sarif
+          sarif_file: snyk.sarif
+
 
