@@ -78,7 +78,8 @@ jobs:
         with: 
           dotnet-version: 8.0.201
       - name: Restore dependencies
-        run: dotnet restore TikTok-Clone-User-Service
+        working-directory: ./TikTok-Clone-User-Service
+        run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/dotnet@master
         continue-on-error: true # To make sure that SARIF upload gets called
