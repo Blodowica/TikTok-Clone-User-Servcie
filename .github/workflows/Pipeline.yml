@@ -72,7 +72,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with: 
@@ -81,13 +81,14 @@ jobs:
         working-directory: ./TikTok-Clone-User-Service
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
-        run: |
-          cd ./TikTok-Clone-User-Service
-          snyk test --all-projects --sarif-file-output=snyk.sarif
+        uses: snyk/actions/dotnet@4
+        continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk.sarif
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: ./TikTok-Clone-User-Service/snyk.sarif
+          sarif_file: ./snyk.sarif
 
