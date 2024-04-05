@@ -72,7 +72,7 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@4
+      - uses: actions/checkout@master
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with: 
@@ -81,7 +81,7 @@ jobs:
         working-directory: ./TikTok-Clone-User-Service
         run: dotnet restore
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dotnet@4
+        uses: snyk/actions/dotnet@master
         continue-on-error: true # To make sure that SARIF upload gets called
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
