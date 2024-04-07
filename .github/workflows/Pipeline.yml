@@ -1,5 +1,4 @@
 name: .NET
-
 on:
   push:
     branches: [ "Development" ]
@@ -99,5 +98,6 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: ./TikTok-Clone-User-Service/snyk.sarif
+
 
 
