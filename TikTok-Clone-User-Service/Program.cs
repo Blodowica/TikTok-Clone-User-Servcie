@@ -1,4 +1,5 @@
 
+using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Services;
 
 namespace TikTok_Clone_User_Service
@@ -13,11 +14,22 @@ namespace TikTok_Clone_User_Service
 
             builder.Services.AddControllers();
             builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
+            
+            builder.Services.AddDbContext<DbUserContext>();
 
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+
+            //dbContext
+            using (var client = new DbUserContext())
+            {
+                client.Database.EnsureCreated();
+            }
+
+
 
             var app = builder.Build();
 

@@ -20,7 +20,7 @@ namespace TikTok_Clone_User_Service.Services
             // Use the correct IP address and port of your Docker container
             _connectionFactory = new ConnectionFactory
             {
-                HostName = "172.17.0.2", // Docker container IP address
+                HostName = "172.17.0.3", // Docker container IP address
                 Port = 5672,              // RabbitMQ default port
                 UserName = "guest",
                 Password = "guest"
