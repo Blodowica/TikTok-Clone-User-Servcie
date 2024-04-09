@@ -8,11 +8,11 @@ namespace TikTok_Clone_User_Service.Models
     {
 
 
-        public int Auth_id { get; set; }
+        public required string Auth_id { get; set; }
         public int Id { get; set; }
         public required string Name { get; set; }
         public required string Email { get; set; }
-        public required string Description { get; set; }
+        public string? Description { get; set; }
         public  required string Role { get; set; }
 
         public ICollection<Follower>? Followers { get; set; }

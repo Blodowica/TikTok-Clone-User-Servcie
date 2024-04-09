@@ -21,7 +21,7 @@ namespace TikTok_Clone_User_Service
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddCors();
 
             //dbContext
             using (var client = new DbUserContext())
@@ -33,6 +33,12 @@ namespace TikTok_Clone_User_Service
 
             var app = builder.Build();
 
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("http://localhost:3000", "*")
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

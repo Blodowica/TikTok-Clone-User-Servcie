@@ -28,14 +28,19 @@ namespace TikTok_Clone_User_Service.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> createUser(string name, string email, string Description )
+        public async Task<IActionResult> createUser([FromBody]  UserDto userDto)
         {
+
+            //check if user exist 
+            var VLUser = await _dbContext.Users.FirstAsync(u => u.Auth_id == userDto.AuthId);
+            if(VLUser != null) { return Ok("user is already in db") ; };
+
             string role = "user";
             var user = new User
             {
-                Name = name,
-                Email = email,
-                Description = Description,
+                Name = userDto.Name,
+                Email = userDto.Email,
+                Auth_id = userDto.AuthId,
                 Role = role
             };
 
