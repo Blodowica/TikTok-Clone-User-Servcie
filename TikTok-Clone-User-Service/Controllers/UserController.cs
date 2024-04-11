@@ -26,6 +26,13 @@ namespace TikTok_Clone_User_Service.Controllers
             return Ok(user);
 
         }
+        [HttpGet("test")]
+        public string TestEndpoint()
+        {
+
+            return "The test endpoint in the user service was successfully reached";
+
+        }
 
         [HttpPost]
         public async Task<IActionResult> createUser([FromBody]  UserDto userDto)
