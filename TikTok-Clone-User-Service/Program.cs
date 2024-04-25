@@ -30,6 +30,10 @@ namespace TikTok_Clone_User_Service
             }
 
 
+            //add RabbitMQ
+            builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+            builder.Services.AddSingleton<RabbitMQVideoConsumer>();
+
 
             var app = builder.Build();
 
@@ -58,7 +62,11 @@ namespace TikTok_Clone_User_Service
 
             app.MapControllers();
 
+
             app.Run();
+            // Start the RabbitMQ consumer
+            var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
+            rabbitMQConsumer.ConsumeMessage("comment_exchange", "testing_comment_queue", "routing_key");
         }
     }
 }
