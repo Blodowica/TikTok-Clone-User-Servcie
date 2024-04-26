@@ -17,13 +17,14 @@ namespace TikTok_Clone_User_Service.Services
 
         public RabbitMQService(IConfiguration configuration)
         {
+            var rabbitMQConfig = configuration.GetSection("RabbitMQConfiguration");
             // Use the correct IP address and port of your Docker container
             _connectionFactory = new ConnectionFactory
             {
-                HostName = "172.17.0.3", // Docker container IP address
-                Port = 5672,              // RabbitMQ default port
-                UserName = "guest",
-                Password = "guest"
+                HostName = rabbitMQConfig["Hostname"], // Replace with your RabbitMQ Docker container IP address
+                Port = Convert.ToInt32(rabbitMQConfig["Port"]),       // RabbitMQ default port
+                UserName = rabbitMQConfig["Username"],
+                Password = rabbitMQConfig["Password"]
             };
             _queueName = "UserPublishQueue";
         }

@@ -2,7 +2,6 @@
 using RabbitMQ.Client.Events;
 using System;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 
 namespace TikTok_Clone_User_Service.Services
 {
@@ -10,17 +9,9 @@ namespace TikTok_Clone_User_Service.Services
     {
         private readonly ConnectionFactory _connectionFactory;
 
-        public RabbitMQVideoConsumer(IConfiguration configuration)
+        public RabbitMQVideoConsumer(ConnectionFactory connectionFactory)
         {
-            var rabbitMQConfig = configuration.GetSection("RabbitMQConfiguration");
-
-            _connectionFactory = new ConnectionFactory
-            {
-                HostName = rabbitMQConfig["Hostname"],
-                Port = Convert.ToInt32(rabbitMQConfig["Port"]),
-                UserName = rabbitMQConfig["Username"],
-                Password = rabbitMQConfig["Password"]
-            };
+            _connectionFactory = connectionFactory;
         }
 
         public void ConsumeMessage(string exchangeName, string queueName, string routingKey)

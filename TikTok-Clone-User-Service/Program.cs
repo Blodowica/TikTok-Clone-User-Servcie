@@ -1,4 +1,5 @@
 
+using RabbitMQ.Client;
 using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Services;
 
@@ -30,8 +31,16 @@ namespace TikTok_Clone_User_Service
             }
 
 
-            //add RabbitMQ
-            builder.Services.AddSingleton<IRabbitMQService, RabbitMQService>();
+            // Add RabbitMQ
+            var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQConfiguration");
+            var connectionFactory = new ConnectionFactory
+            {
+                HostName = rabbitMQConfig["Hostname"],
+                Port = Convert.ToInt32(rabbitMQConfig["Port"]),
+                UserName = rabbitMQConfig["Username"],
+                Password = rabbitMQConfig["Password"]
+            };
+            builder.Services.AddSingleton(connectionFactory);
             builder.Services.AddSingleton<RabbitMQVideoConsumer>();
 
 
@@ -63,10 +72,11 @@ namespace TikTok_Clone_User_Service
             app.MapControllers();
 
 
-            app.Run();
-            // Start the RabbitMQ consumer
             var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
             rabbitMQConsumer.ConsumeMessage("comment_exchange", "testing_comment_queue", "routing_key");
+
+            app.Run();
+            // Start the RabbitMQ consumer
         }
     }
 }
