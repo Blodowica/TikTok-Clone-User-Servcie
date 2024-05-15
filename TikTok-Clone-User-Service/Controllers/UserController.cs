@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Security.Policy;
 using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Models;
@@ -33,6 +35,15 @@ namespace TikTok_Clone_User_Service.Controllers
             return "The test endpoint in the user service was successfully reached";
 
         }
+
+        //auth done in the APIgateway
+   
+            [HttpGet("testAuth")]
+            public string TestAuthEndpoint()
+            {
+                    return "Authenticated: The test endpoint in the user service was successfully reached";
+            }
+        
 
         [HttpPost]
         public async Task<IActionResult> createUser([FromBody]  UserDto userDto)

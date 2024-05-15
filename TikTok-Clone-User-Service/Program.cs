@@ -32,6 +32,11 @@ namespace TikTok_Clone_User_Service
 
 
             // Add RabbitMQ
+
+
+            try
+            {
+
             var rabbitMQConfig = builder.Configuration.GetSection("RabbitMQConfiguration");
             var connectionFactory = new ConnectionFactory
             {
@@ -42,6 +47,11 @@ namespace TikTok_Clone_User_Service
             };
             builder.Services.AddSingleton(connectionFactory);
             builder.Services.AddSingleton<RabbitMQVideoConsumer>();
+            }
+            catch
+            {
+
+            }
 
 
             var app = builder.Build();
@@ -72,8 +82,14 @@ namespace TikTok_Clone_User_Service
             app.MapControllers();
 
 
-            var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
-            rabbitMQConsumer.ConsumeMessage("comment_exchange", "testing_comment_queue", "routing_key");
+            try
+            {
+
+         /*   var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
+            rabbitMQConsumer.ConsumeMessage("comment_exchange", "testing_comment_queue", "routing_key");*/
+            }
+            catch { }
+
 
             app.Run();
             // Start the RabbitMQ consumer
