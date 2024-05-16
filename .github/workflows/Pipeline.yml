@@ -1,84 +1,98 @@
-name: Azure App Service Deployment
 
+name: .NET
 on:
   push:
-    branches:
-      - Development
+    branches: [ "Development" ]
+  pull_request:
+    branches: [ "Development" ]
 
 jobs:
-  build_and_deploy:
+  build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-
-      - name: Restore dependencies
-        run: dotnet restore TikTok-Clone-User-Service
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Run Unit tests
-        run: dotnet test --no-restore --verbosity normal
-
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.201
+    - name: Restore dependencies
+      run: dotnet restore TikTok-Clone-User-Service
+      
+    - name: Build
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Run Unit tests
+      working-directory: ./TikTok-Clone-User-Service
+      run: dotnet test --no-restore --verbosity normal
+      
+  analyze:
+    name: Build and analyze
+    runs-on: windows-latest
+    steps:
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: 'zulu'
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v2
+          distribution: 'zulu' # Alternative distribution options are available.
+      - uses: actions/checkout@v3
         with:
-          path: ~/.sonar/cache
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
-          path: ./.sonar/scanner
+          path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
-
       - name: Install SonarCloud scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
         run: |
-          mkdir -p .sonar/scanner
-          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
       - name: Build and analyze
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
         run: |
-          ./.sonar/scanner/dotnet-sonarscanner begin /k:"Blodowica_TikTok-Clone-User-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-          dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj --no-incremental
-          ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-
-      - name: Setup .NET for security check
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.x
-
-      - name: Restore dependencies for security check
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Blodowica_TikTok-Clone-User-Servcie" /o:"blodowica" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          dotnet build TikTok-Clone-User-Service/TikTok-Clone-User-Service.csproj  --no-incremental
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with: 
+          dotnet-version: 8.0.201
+      
+      - name: Restore dependencies
         run: dotnet restore TikTok-Clone-User-Service
-
       - name: Run Snyk to check for vulnerabilities
         run: |
-          cd ./TikTok-Clone-User-Service
+          # Change directory to your project directory
+          cd ././TikTok-Clone-User-Service
+          
+          # Install Snyk CLI
           npm install -g snyk
+          
+          # Authenticate with Snyk using token
           snyk auth ${{ secrets.SNYK_TOKEN }}
+          
+          # Run Snyk to check for vulnerabilities
           snyk test --sarif-file-output=snyk.sarif
-        continue-on-error: true
-
+        continue-on-error: true # To ensure SARIF upload gets called even if Snyk fails
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
