@@ -117,10 +117,10 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           cd ./TikTok-Clone-User-Service
-          docker build -t tiktok-clone-user-service -f TikTok-Clone-User-Service/Dockerfile TikTok-Clone-User-Service
-          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-          docker tag tiktok-clone-user-service ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-clone-user-service
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/tiktok-clone-user-service
+          docker build -t tiktok-clone-user-service .
+          docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+          docker tag tiktok-clone-user-service $DOCKERHUB_USERNAME/tiktok-clone-user-service
+          docker push $DOCKERHUB_USERNAME/tiktok-clone-user-service
 
       - name: Deploy to Azure App Service
         uses: Azure/webapps-deploy@v2
