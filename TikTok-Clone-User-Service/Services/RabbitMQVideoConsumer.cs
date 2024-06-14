@@ -81,7 +81,18 @@ namespace TikTok_Clone_User_Service.Services
                 }
                 else if (likeAction != null && likeAction.Status == "disliked")
                 {
-                    // Implement dislike handling if necessary
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        var likeActionService = scope.ServiceProvider.GetRequiredService<ILikeActionService>();
+                        try
+                        {
+                            likeActionService.removeUserLikedVideos(likeAction.AuthId, likeAction.VideoId);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error processing like action: {ex.Message}");
+                        }
+                    }
                 }
             }
         }
