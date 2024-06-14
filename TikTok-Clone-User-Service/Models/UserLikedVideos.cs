@@ -8,8 +8,7 @@ namespace TikTok_Clone_User_Service.Models
         public int userId { get; set; }
         public int videoId { get; set; }
 
-        [JsonIgnore]
-        public required User User { get; set; }
+        public  User? User { get; set; }
 
 
     }

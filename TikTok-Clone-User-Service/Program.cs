@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using System;
+using System.Configuration;
 using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Services;
 
@@ -17,14 +19,21 @@ namespace TikTok_Clone_User_Service
             builder.Services.AddControllers();
             builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
             builder.Services.AddScoped<ILikeActionService, LikeActionService>();
-            builder.Services.AddDbContext<DbUserContext>();
+           
+            //databse configuration
+            //builder.Services.AddDbContext<DbUserContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("userDatabase")));
+            var connectionString = builder.Configuration.GetConnectionString("userDatabase");
+            Console.WriteLine(connectionString);
+            builder.Services.AddDbContext<DbUserContext>(options =>
+                options.UseSqlServer(connectionString));
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddCors();
 
             // Configuration for RabbitMQ
             ConfigureRabbitMQ(builder);
-
+            
             var app = builder.Build();
 
             // Middleware and pipeline configuration
@@ -37,9 +46,9 @@ namespace TikTok_Clone_User_Service
 
             if (app.Environment.IsDevelopment())
             {
+            }
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
 
             if (!app.Environment.IsDevelopment())
             {
@@ -88,7 +97,7 @@ namespace TikTok_Clone_User_Service
 
                 // Example: Start consumers for different queues
                 rabbitMQConsumer.ConsumeMessage("video_exchange", "like_video_queue", "like_video_queue");
-                rabbitMQConsumer.ConsumeMessage("exchange_name", "queue_name_2", "routing_key_2");
+                //rabbitMQConsumer.ConsumeMessage("exchange_name", "queue_name_2", "routing_key_2");
                 // Add more consumers as needed with different queue names
             }
             catch (Exception ex)

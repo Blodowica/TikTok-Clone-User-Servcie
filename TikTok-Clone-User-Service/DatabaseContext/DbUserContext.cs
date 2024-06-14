@@ -9,10 +9,14 @@ namespace TikTok_Clone_User_Service.DatabaseContext
         public DbSet<User> Users { get; set; }
         public DbSet<Follower> Followers { get; set; }
         public DbSet<UserLikedVideos> LikedVideos { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+      /*  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Filename=userDatabase.db");
-        }
+        }*/
+
+        public DbUserContext(DbContextOptions<DbUserContext> options) : base(options)
+        { }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
