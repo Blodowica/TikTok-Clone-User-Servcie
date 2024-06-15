@@ -57,7 +57,8 @@ namespace TikTok_Clone_User_Service.Services
                 if (user == null) { return; }
 
                 //find if the video is liked by the user 
-                var userlikedVideo = await _userContext.LikedVideos.FirstOrDefaultAsync(lv => lv.userId == user.Id && lv.videoId == videoId);
+                var userlikedVideo = await _userContext.LikedVideos.FirstOrDefaultAsync(lv =>
+                lv.userId == user.Id && lv.videoId == videoId);
                 if(userlikedVideo == null) { return;}
 
                 _userContext.LikedVideos.Remove(userlikedVideo);

@@ -68,8 +68,10 @@ namespace TikTok_Clone_User_Service
                 };
 
                 // Register RabbitMQ services
+               
                 builder.Services.AddSingleton(connectionFactory);
-                builder.Services.AddHostedService<RabbitMQVideoConsumer>(); // Register as hosted service
+                builder.Services.AddHostedService(provider =>
+                    new RabbitMQVideoConsumer(connectionFactory, provider.GetRequiredService<IServiceProvider>(), "video_exchange", "like_video_queue"));
             }
             catch (Exception ex)
             {

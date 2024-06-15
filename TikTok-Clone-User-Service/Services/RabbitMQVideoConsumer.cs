@@ -16,11 +16,15 @@ namespace TikTok_Clone_User_Service.Services
         private readonly ConnectionFactory _connectionFactory;
         private readonly IServiceProvider _serviceProvider;
         private IModel _channel;
+        private readonly string _exchangeName;
+        private readonly string _queueName;
 
-        public RabbitMQVideoConsumer(ConnectionFactory connectionFactory, IServiceProvider serviceProvider)
+        public RabbitMQVideoConsumer(ConnectionFactory connectionFactory, IServiceProvider serviceProvider, string exchangeName, string queueName)
         {
             _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _exchangeName = exchangeName ?? throw new ArgumentNullException(nameof(exchangeName));
+            _queueName = queueName ?? throw new ArgumentNullException(nameof(queueName));
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -31,12 +35,15 @@ namespace TikTok_Clone_User_Service.Services
             _channel = connection.CreateModel();
 
             // Declare the exchange if it doesn't exist with the desired properties
-            _channel.ExchangeDeclare(exchange: "video_exchange", type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+            _channel.ExchangeDeclare(exchange: _exchangeName, type: ExchangeType.Direct,
+                durable: true, autoDelete: false, arguments: null);
 
             // Declare the queue to ensure the queue exists
-            _channel.QueueDeclare(queue: "like_video_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: _queueName, durable: true, exclusive: false,
+                autoDelete: false, arguments: null);
 
-            _channel.QueueBind(queue: "like_video_queue", exchange: "video_exchange", routingKey: "like_video_queue");
+            _channel.QueueBind(queue: _queueName, exchange:_exchangeName, 
+                routingKey:_queueName);
 
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += async (model, ea) =>
@@ -47,12 +54,12 @@ namespace TikTok_Clone_User_Service.Services
                 Console.WriteLine("Received: {0}", message);
 
                 // Handle the received message here
-                await HandleMessageAsync(message, "like_video_queue");
+                await HandleMessageAsync(message,_queueName);
             };
 
-            _channel.BasicConsume(queue: "like_video_queue", autoAck: true, consumer: consumer);
+            _channel.BasicConsume(queue:_queueName, autoAck: true, consumer: consumer);
 
-            Console.WriteLine($"Consuming messages from queue 'like_video_queue'...");
+            Console.WriteLine($"Consuming messages from queue '{_queueName}'...");
             return Task.CompletedTask;
         }
 
@@ -103,6 +110,8 @@ namespace TikTok_Clone_User_Service.Services
                     }
                 }
             }
+
+            //if the theres another queue do a different action
         }
     }
 }
