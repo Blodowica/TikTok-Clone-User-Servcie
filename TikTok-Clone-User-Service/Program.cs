@@ -64,7 +64,8 @@ namespace TikTok_Clone_User_Service
                     HostName = rabbitMQConfig["Hostname"],
                     Port = Convert.ToInt32(rabbitMQConfig["Port"]),
                     UserName = rabbitMQConfig["Username"],
-                    Password = rabbitMQConfig["Password"]
+                    Password = rabbitMQConfig["Password"],
+                    VirtualHost = rabbitMQConfig["Virtualhost"]
                 };
 
                 // Register RabbitMQ services

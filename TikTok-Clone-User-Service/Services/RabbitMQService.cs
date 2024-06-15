@@ -24,7 +24,8 @@ namespace TikTok_Clone_User_Service.Services
                 HostName = rabbitMQConfig["Hostname"], // Replace with your RabbitMQ Docker container IP address
                 Port = Convert.ToInt32(rabbitMQConfig["Port"]),       // RabbitMQ default port
                 UserName = rabbitMQConfig["Username"],
-                Password = rabbitMQConfig["Password"]
+                Password = rabbitMQConfig["Password"],
+                VirtualHost = rabbitMQConfig["Virtualhost"]
             };
             _queueName = "UserPublishQueue";
         }
