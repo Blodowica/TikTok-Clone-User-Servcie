@@ -1,17 +1,21 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using TikTok_Clone_User_Service.Models;
 
 namespace TikTok_Clone_User_Service.Services
 {
-    public class RabbitMQVideoConsumer
+    public class RabbitMQVideoConsumer : BackgroundService
     {
         private readonly ConnectionFactory _connectionFactory;
         private readonly IServiceProvider _serviceProvider;
+        private IModel _channel;
 
         public RabbitMQVideoConsumer(ConnectionFactory connectionFactory, IServiceProvider serviceProvider)
         {
@@ -19,23 +23,23 @@ namespace TikTok_Clone_User_Service.Services
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
-        public void ConsumeMessage(string exchangeName, string queueName, string routingKey)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            using var channel = connection.CreateModel();
+            stoppingToken.ThrowIfCancellationRequested();
+
+            var connection = _connectionFactory.CreateConnection();
+            _channel = connection.CreateModel();
 
             // Declare the exchange if it doesn't exist with the desired properties
-            channel.ExchangeDeclare(exchange: exchangeName, type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
+            _channel.ExchangeDeclare(exchange: "video_exchange", type: ExchangeType.Direct, durable: true, autoDelete: false, arguments: null);
 
             // Declare the queue to ensure the queue exists
-            channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
+            _channel.QueueDeclare(queue: "like_video_queue", durable: true, exclusive: false, autoDelete: false, arguments: null);
 
-            channel.QueueBind(queue: queueName,
-                              exchange: exchangeName,
-                              routingKey: routingKey);
+            _channel.QueueBind(queue: "like_video_queue", exchange: "video_exchange", routingKey: "like_video_queue");
 
-            var consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
+            var consumer = new EventingBasicConsumer(_channel);
+            consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
@@ -43,19 +47,23 @@ namespace TikTok_Clone_User_Service.Services
                 Console.WriteLine("Received: {0}", message);
 
                 // Handle the received message here
-                HandleMessage(message, queueName);
+                await HandleMessageAsync(message, "like_video_queue");
             };
 
-            channel.BasicConsume(queue: queueName,
-                                 autoAck: false,
-                                 consumer: consumer);
+            _channel.BasicConsume(queue: "like_video_queue", autoAck: true, consumer: consumer);
 
-            Console.WriteLine($"Consuming messages from queue '{queueName}'...");
-            Console.WriteLine(" Press [enter] to exit.");
-            Console.ReadLine();
+            Console.WriteLine($"Consuming messages from queue 'like_video_queue'...");
+            return Task.CompletedTask;
         }
 
-        private async Task HandleMessage(string message, string queueName)
+        public override void Dispose()
+        {
+            _channel?.Close();
+            _channel?.Dispose();
+            base.Dispose();
+        }
+
+        private async Task HandleMessageAsync(string message, string queueName)
         {
             // Implement your message handling logic here
             Console.WriteLine($"Handling message: {message}");
@@ -86,7 +94,7 @@ namespace TikTok_Clone_User_Service.Services
                         var likeActionService = scope.ServiceProvider.GetRequiredService<ILikeActionService>();
                         try
                         {
-                            likeActionService.removeUserLikedVideos(likeAction.AuthId, likeAction.VideoId);
+                           await likeActionService.removeUserLikedVideos(likeAction.AuthId, likeAction.VideoId);
                         }
                         catch (Exception ex)
                         {

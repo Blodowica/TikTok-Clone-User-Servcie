@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
-using System;
 using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Services;
 
@@ -19,9 +18,8 @@ namespace TikTok_Clone_User_Service
             builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
             builder.Services.AddScoped<ILikeActionService, LikeActionService>();
 
-            //databse configuration
+            // Database configuration
             var connectionString = builder.Configuration.GetConnectionString("userDatabase");
-            Console.WriteLine(connectionString);
             builder.Services.AddDbContext<DbUserContext>(options =>
                 options.UseSqlServer(connectionString));
 
@@ -42,9 +40,6 @@ namespace TikTok_Clone_User_Service
                        .AllowAnyHeader();
             });
 
-            if (app.Environment.IsDevelopment())
-            {
-            }
             app.UseSwagger();
             app.UseSwaggerUI();
 
@@ -55,9 +50,6 @@ namespace TikTok_Clone_User_Service
 
             app.UseAuthorization();
             app.MapControllers();
-
-            // Start the RabbitMQ consumer for different queues
-            StartRabbitMQConsumers(app);
 
             app.Run();
         }
@@ -77,41 +69,12 @@ namespace TikTok_Clone_User_Service
 
                 // Register RabbitMQ services
                 builder.Services.AddSingleton(connectionFactory);
-                builder.Services.AddSingleton<RabbitMQVideoConsumer>();
+                builder.Services.AddHostedService<RabbitMQVideoConsumer>(); // Register as hosted service
             }
             catch (Exception ex)
             {
                 // Handle RabbitMQ configuration exception
                 Console.WriteLine($"Failed to configure RabbitMQ: {ex.Message}");
-                throw;
-            }
-        }
-
-        private static void StartRabbitMQConsumers(WebApplication app)
-        {
-            try
-            {
-                // Get a scope to resolve scoped services
-                using var scope = app.Services.CreateScope();
-                var dbContext = scope.ServiceProvider.GetRequiredService<DbUserContext>();
-
-                // Check if the database is available
-                if (!dbContext.Database.CanConnect())
-                {
-                    throw new Exception("Database is not available");
-                }
-
-                var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
-
-                // Example: Start consumers for different queues
-                rabbitMQConsumer.ConsumeMessage("video_exchange", "like_video_queue", "like_video_queue");
-                //rabbitMQConsumer.ConsumeMessage("exchange_name", "queue_name_2", "routing_key_2");
-                // Add more consumers as needed with different queue names
-            }
-            catch (Exception ex)
-            {
-                // Handle RabbitMQ consumer start exception
-                Console.WriteLine($"Failed to start RabbitMQ consumers: {ex.Message}");
                 throw;
             }
         }
