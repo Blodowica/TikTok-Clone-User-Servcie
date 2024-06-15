@@ -50,7 +50,7 @@ namespace TikTok_Clone_User_Service.Controllers
         {
 
             //check if user exist 
-            var VLUser = await _dbContext.Users.FirstAsync(u => u.Auth_id == userDto.AuthId);
+            var VLUser = await _dbContext.Users.FirstOrDefaultAsync(u => u.Auth_id == userDto.AuthId);
             if(VLUser != null) { return Ok("user is already in db") ; };
 
             string role = "user";

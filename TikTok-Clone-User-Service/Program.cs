@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using System;
-using System.Configuration;
 using TikTok_Clone_User_Service.DatabaseContext;
 using TikTok_Clone_User_Service.Services;
 
@@ -19,9 +18,8 @@ namespace TikTok_Clone_User_Service
             builder.Services.AddControllers();
             builder.Services.AddScoped<IRabbitMQService, RabbitMQService>();
             builder.Services.AddScoped<ILikeActionService, LikeActionService>();
-           
+
             //databse configuration
-            //builder.Services.AddDbContext<DbUserContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("userDatabase")));
             var connectionString = builder.Configuration.GetConnectionString("userDatabase");
             Console.WriteLine(connectionString);
             builder.Services.AddDbContext<DbUserContext>(options =>
@@ -33,7 +31,7 @@ namespace TikTok_Clone_User_Service
 
             // Configuration for RabbitMQ
             ConfigureRabbitMQ(builder);
-            
+
             var app = builder.Build();
 
             // Middleware and pipeline configuration
@@ -47,8 +45,8 @@ namespace TikTok_Clone_User_Service
             if (app.Environment.IsDevelopment())
             {
             }
-                app.UseSwagger();
-                app.UseSwaggerUI();
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             if (!app.Environment.IsDevelopment())
             {
@@ -93,6 +91,16 @@ namespace TikTok_Clone_User_Service
         {
             try
             {
+                // Get a scope to resolve scoped services
+                using var scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<DbUserContext>();
+
+                // Check if the database is available
+                if (!dbContext.Database.CanConnect())
+                {
+                    throw new Exception("Database is not available");
+                }
+
                 var rabbitMQConsumer = app.Services.GetRequiredService<RabbitMQVideoConsumer>();
 
                 // Example: Start consumers for different queues

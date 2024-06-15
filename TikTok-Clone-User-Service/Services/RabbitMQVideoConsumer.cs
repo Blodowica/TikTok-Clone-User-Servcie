@@ -55,7 +55,7 @@ namespace TikTok_Clone_User_Service.Services
             Console.ReadLine();
         }
 
-        private void HandleMessage(string message, string queueName)
+        private async Task HandleMessage(string message, string queueName)
         {
             // Implement your message handling logic here
             Console.WriteLine($"Handling message: {message}");
@@ -71,7 +71,7 @@ namespace TikTok_Clone_User_Service.Services
                         var likeActionService = scope.ServiceProvider.GetRequiredService<ILikeActionService>();
                         try
                         {
-                            likeActionService.addUserLikedVideos(likeAction.AuthId, likeAction.VideoId);
+                            await likeActionService.addUserLikedVideos(likeAction.AuthId, likeAction.VideoId);
                         }
                         catch (Exception ex)
                         {
